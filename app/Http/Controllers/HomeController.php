@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Classe;
 use App\Cours;
+use App\Eleve;
 use App\Horaire;
 use App\Jour;
 use App\Matiere;
 use App\Personnel;
+use App\Responsable;
 use App\Salle;
 use App\Seance;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -65,7 +68,18 @@ class HomeController extends Controller
     }
 
 
-    public function loadAdminHome(){}
+    public function loadAdminHome(){
+        $profs=count(Personnel::all());
+        $eleves=count(Eleve::all());
+        $parents=count(Responsable::all());
+
+        $data=[];
+        $data["profs"]=$profs;
+        $data["eleves"]=$eleves;
+        $data["parents"]=$parents;
+
+        return new JsonResponse($data,200);
+    }
 
 
     public function loadParentHome(){}

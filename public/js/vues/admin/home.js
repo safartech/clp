@@ -16,32 +16,33 @@ let home={
         }
     },
     mounted(){
-        // alert('hello')
+         alert('hello')
         moment.locale('fr')
-        this.init()
 
-        this.loadClasses()
+        this.loadDatas()
     },
     methods:{
 
-        loadClasses(){
-            instance.get('liste_classes')
-                .then((response)=> {
-                    this.classes=response.data
-                    this.classe = this.classes[0]
-                    this.classeClicked(this.classe)
-                    console.log(response.data)
-                })
-                .catch( (error) => {
-                    console.log(error.response.data);
-                })
+        loadDatas(){
+            this.parents=5
+            this.profs=6
+            this.eleves=7
+            // instance.get('load_admin_home')
+            //     .then((response)=> {
+            //         console.log(response.data)
+            //         this.parents=response.data.parents
+            //         this.profs=response.data.profs
+            //         this.eleves=response.data.eleves
+            //
+            //     })
+            //     .catch( (error) => {
+            //         console.log(error.response.data);
+            //     })
         },
 
 
     },
-    computed:{
 
-    }
 }
 
 let vm=new Vue({
