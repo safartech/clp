@@ -1,0 +1,583 @@
+/**
+ * Created by User on 22/11/2018.
+ */
+
+import {url} from '../../../base_url.js'
+//        alert(baseUrl)
+let instance = axios.create({
+    baseURL : url
+});
+
+const add = (a,b) => a+b;
+
+let notes = {
+    template: "#notes",
+    data(){
+        return {
+            classes:[],
+            eleves:[],
+            notes:[],
+            evs:[
+                {
+                    nom:"Farid",
+                    evaluations:[{
+                        pivot:{
+                            note: 20
+                        }
+                    }]
+                },
+            ],
+            matieres:[],
+            sousMatieres:[],
+            modules:[],
+            sessions:[],
+            inters:[],
+            appreciations:[],
+            selectedClasseId: null,
+            selectedEleveId: null,
+            selectedSousMatiereId: null,
+            selectedModuleId: null,
+            selectedMatiereId: null,
+            selectedSessionId: null,
+            selectedClasse: {
+                eleves:[]
+            },
+            selectedMatiere: {},
+            selectedSousMatiere: {},
+            selectedModule: {},
+            selectedSession: {},
+            evals:[],
+            evaluations:[],
+            selectedEval:{
+                id:0,
+                date: "",
+                notation:0,
+                coef:0,
+                commentaire:"",
+                session_id: this.selectedSessionId,
+                classe_id:this.selectedClasseId,
+                matiere_id:this.selectedMatiereId,
+            },
+            evaluation:{
+                date: "",
+                notation:10,
+                coef:1,
+                commentaire:"",
+                session_id: this.selectedSessionId,
+                classe_id:this.selectedClasseId,
+                matiere_id:this.selectedMatiereId,
+                sous_matiere_id:this.selectedSousMatiereId,
+                module_id:this.selectedModuleId
+            },
+            readyToPair: false,
+            link:"",
+            basePintLink: url+"releve/print/classe/",
+            showInput:false,
+            showApprInput:false,
+            clickedEvaluationColumn:{},
+        }
+    },
+    mounted(){
+        // $('#mainTable').editableTableWidget().find('td:first').focus();
+        this.loadDatas()
+        this.initView()
+        moment.locale('fr')
+    },
+    watch:{
+        selectedClasseId(value){
+//                    this.matieres = []
+        },
+        ready(value){
+            if(this.ready){
+//                      this.evals = this.evaluation.filter(it => it.classe_id == this.selectedClasseId && it.matiere_id == this.selectedMatiereId && it.session_id == this.selectedSessionId)
+//                      alert(this.readyToPair)
+//                      console.log(this.evals)
+//                      this.loadEvaluations();
+
+            }else {
+                this.evals = []
+//                      alert(this.readyToPair)
+            }
+        }
+    },
+    computed:{
+        ready(){
+//                  alert("ready")
+//                  this.readyToPair = this.selectedClasseId != null && this.selectedMatiereId!=null && this.selectedSessionId!=null;
+            if (this.selectedEleveId != null){
+                if(this.selectedMatiereId!=null){
+                    if(this.selectedMatiere.sous_matieres.length != 0){
+                        if(this.selectedSousMatiereId!=null){
+//                                  this.selectedSousMatiere = this.sousMatieres.filter(it=>it.id == this.selectedSousMatiereId)[0]
+                            if(this.selectedSousMatiere.modules && this.selectedSousMatiere.modules.length !=0){
+                                if(this.selectedModuleId!=null){
+                                    if(this.selectedSessionId!=null){
+//                                              this.readyToPair = true
+                                        this.evals = []
+                                        this.loadEvaluations()
+//                                              alert()
+                                        return true
+                                    }
+                                }
+                            }else {
+                                if(this.selectedSessionId!=null){
+//                                          this.readyToPair = true
+                                    this.evals = []
+                                    this.loadEvaluations()
+//                                          alert()
+                                    return true
+                                }
+                            }
+                        }
+                    }else {
+                        if(this.selectedSessionId!=null){
+//                                  this.readyToPair = true
+                            this.evals = []
+                            this.loadEvaluations()
+//                                  alert()
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+//                  return this.selectedClasseId != null && this.selectedMatiereId!=null && this.selectedSessionId!=null;
+        },
+        hasSousMatiere(){
+            return this.sousMatieres.length!=0
+        },
+        hasModule(){
+            return this.modules.length != 0
+        }
+    },
+    methods:{
+        closeAllInputs(){
+            this.clickedEvaluationColumn = {}
+            this.showApprInput = false
+        },
+        showAppreciationInput(){
+            this.showApprInput = true
+        },
+        apprBlur(e){
+            // var appreciation = prompt("Entrer l'appréciation")
+            // alert(e.appreciations[0].appreciation);
+            // e.appreciations[0].appreciation = appr
+            instance.post('set_appreciation',e.appreciations[0]).then(res=>{
+                console.log(res.data)
+                e.appreciations[0].appreciation = res.data
+                $.gritter.add({
+                    title:"Appréciation prise en compte ave success",
+                    time:1000,
+                    text:"",
+                    class_name:"colo success"
+                })
+            }).catch(err=>{
+                console.log(err.response.data)
+                // alert("Appréciation non enrégistrée: Veuillez saisir de nouveau SVP.")
+                e.appreciations[0].appreciation = ""
+                $.gritter.add({
+                    title:"Appréciation non enrégistrée",
+                    time:1000,
+                    text:"Veuillez saisir de nouveau SVP.",
+                    class_name:"colo success"
+                })
+            })
+        },
+        moment(date,format=""){
+            return new moment(date).format(format)
+        },
+        getMoment(date){
+            return new moment(date).format('YYYY-MM-DD')
+        },
+
+        moyCalc(evals){
+            // console.log(evals)
+            let total = 0
+            let moyenne = 0
+            let offEval = 0
+            let notes = []
+            evals.forEach(e=>{
+                if(!e.notes[0].note || isNaN(e.notes[0].note)){
+                    offEval+=1
+                    // alert(0)
+                }else {
+                    // alert(e.eleves[0].pivot.note)
+                    total = parseFloat(total) + parseFloat(e.notes[0].note)
+                }
+            })
+            moyenne = total/(evals.length-offEval)
+            // console.log("total",total)
+            // console.log("evals",evals.length)
+            if(isNaN(moyenne)) return ""
+            return moyenne.toFixed(2);
+
+        },
+        selectEval(e){
+//                    console.log(e)
+            this.selectedEval.id = e.id
+            this.selectedEval.date = e.date,
+                this.selectedEval.notation = e.notation,
+                this.selectedEval.coef = e.coef,
+                this.selectedEval.commentaire = e.commentaire
+//                    console.log(this.selectedEval)
+            $('#updateEvaluationModal').openModal()
+        },
+        updateEvaluation(){
+            instance.put('update_evaluation/'+this.selectedEval.id,this.selectedEval)
+                .then(res=>{
+//                            console.log(res.data)
+                    this.loadEvaluations()
+                }).catch(err=>{
+                console.log(err.response.data)
+            })
+        },
+        deleteEvaluation(){
+            instance.get('delete_evaluation/'+this.selectedEval.id).then(res=>{
+                console.log(res.data)
+                this.loadEvaluations()
+            })
+                .catch(err=>{
+                    console.log(err.response.data)
+                })
+        },
+        moment(date){
+            return new moment(date).locale('fr')
+        } ,
+
+
+        initView(){
+            $('#select2-eleve')
+            // init select2
+                .select2()
+                .trigger('change')
+                // emit event on change.
+                .on('change',(e)=> {
+                    this.selectedEleveId = $('#select2-eleve').val()
+                    this.eleveChange($('#select2-eleve').val())
+                });
+            $('#select2-matiere')
+            // init select2
+                .select2()
+                .trigger('change')
+                // emit event on change.
+                .on('change',()=> {
+                    // alert(this.value)
+                    this.selectedMatiereId = $('#select2-matiere').val()
+                    this.matiereChange($('#select2-matiere').val())
+                    if(this.ready){
+                        this.loadEvaluations()
+                    }
+                });
+            $('#select2-sm')
+            // init select2
+                .select2()
+                .trigger('change')
+                // emit event on change.
+                .on('change',()=> {
+                    // alert(this.value)
+                    this.selectedSousMatiereId = $('#select2-sm').val()
+                    this.smChange($('#select2-sm').val())
+                    if(this.ready){
+                        this.loadEvaluations()
+                    }
+                });
+            $('#select2-mod')
+            // init select2
+                .select2()
+                .trigger('change')
+                // emit event on change.
+                .on('change',()=> {
+                    // alert(this.value)
+                    this.selectedModuleId = $('#select2-mod').val()
+                    this.moduleChange($('#select2-mod').val())
+                    if(this.ready){
+                        this.loadEvaluations()
+                    }
+                });
+
+            $('#select2-session')
+            // init select2
+                .select2()
+                .trigger('change')
+                // emit event on change.
+                .on('change', ()=> {
+                    // alert(this.value)
+                    this.selectedSessionId = $('#select2-session').val()
+                    this.sessionChange($('#select2-session').val())
+                    if(this.ready){
+                        this.loadEvaluations()
+                    }
+                });
+
+        },
+        reload(){
+            this.loadDatas()
+        },
+        loadDatas(){
+            instance.get('load_notes_datas_from_parent').then(res=>{
+                console.log(res.data)
+                this.eleves = res.data.eleves
+                this.sessions = res.data.sessions
+            }).catch(err=>{
+                console.log(err.response.data)
+            })
+        },
+
+        eleveChange(){
+            this.matieres = []
+            this.sousMatieres = []
+            this.modules = []
+            this.selectedMatiereId = null
+            this.selectedSousMatiereId = null
+            this.selectedModuleId= null
+
+            this.selectedEleve = this.eleves.find(it=>it.id == this.selectedEleveId)
+            // console.log(this.selectedEleve)
+            this.matieres = this.selectedEleve.classe.niveau.matieres;
+            this.reloadMatiereSelector()
+        },
+
+        classeChange(classeId){
+            // alert(new_id)
+            this.matieres = []
+            this.sousMatieres = []
+            this.modules = []
+            this.selectedMatiereId = null
+            this.selectedSousMatiereId = null
+            this.selectedModuleId= null
+
+            this.evaluation.classe_id = classeId;
+            this.selectedClasse = this.classes.find(it=>it.id==classeId);
+            this.matieres = this.selectedClasse.niveau.matieres
+            // alert(this.matieres.length)
+
+            // this.reInit()
+            this.reloadMatiereSelector()
+        },
+        reInit(){
+            this.currentMatiere = []
+            this.currentMatiereId = null
+            // this.currentEvaluations = [];
+        },
+        matiereChange(matId){
+//                    alert("m")
+//                    alert(this.selectedMatiereId)
+            this.sousMatieres = []
+            this.modules = []
+            this.selectedSousMatiereId = null
+            this.selectedModuleId= null
+            /*this.selectedSousMatiere = {}
+             this.selectedModule = {}*/
+
+            this.evaluation.matiere_id = matId
+            this.selectedMatiere = this.matieres.filter(it=>it.id == matId)[0]
+            if(this.selectedMatiere && this.selectedMatiere.sous_matieres.lenth != 0){
+                this.selectedMatiere.sous_matieres.forEach(sm=>{
+//                            console.log(sm)
+                    this.sousMatieres.push(sm)
+                })
+            }else {
+
+            }
+
+            this.reloadSMSelector()
+
+        },
+        smChange(smId){
+//                    alert("sm")
+            this.modules = []
+            this.selectedModuleId= null
+            // this.evaluation.sous_matiere_id = this.selectedSousMatiereId
+            this.evaluation.sous_matiere_id = smId
+            this.selectedSousMatiere = this.sousMatieres.filter(it=>it.id == smId)[0]
+            if(this.selectedSousMatiere && this.selectedSousMatiere.modules.length !=0){
+                this.selectedSousMatiere.modules.forEach(mod=> this.modules.push(mod))
+            }
+
+            this.reloadModuleSelector()
+        },
+        moduleChange(modId){
+            // this.evaluation.module_id = this.selectedModuleId
+            this.evaluation.module_id = modId
+            this.selectedModule = this.modules.filter(it=>it.id==modId)[0]
+        },
+        sessionChange(sId){
+            this.selectedSession = this.sessions.filter(it=>it.id == sId)[0]
+            this.evaluation.session_id = this.selectedSession.id
+        },
+
+
+        reloadMatiereSelector(){
+            let options = [{
+                id:"null",
+                text:"Selectionner une matière",
+                disabled:true,
+                selected:true
+            }]
+            this.matieres.forEach(m=>{
+                options.push({
+                    id:m.id,
+                    text:m.intitule
+                })
+            })
+            $('#select2-matiere').empty()
+            $('#select2-sm').empty()
+            $('#select2-mod').empty()
+            $('#select2-matiere').select2({
+                    data:options
+                }
+
+            )
+        },
+        reloadSMSelector(){
+            let options = [{
+                id:"null",
+                text:"Selectionner une sous-matière",
+                disabled:true,
+                selected:true
+            }]
+            this.sousMatieres.forEach(m=>{
+                options.push({
+                    id:m.id,
+                    text:m.nom
+                })
+            })
+            $('#select2-sm').empty()
+            $('#select2-sm').select2({
+                    data:options
+                }
+
+            )
+        },
+        reloadModuleSelector(){
+            let options = [{
+                id:"null",
+                text:"Selectionner un module",
+                disabled:true,
+                selected:true
+            }]
+            this.modules.forEach(m=>{
+                options.push({
+                    id:m.id,
+                    text:m.nom
+                })
+            })
+            $('#select2-mod').empty()
+            $('#select2-mod').select2({
+                    data:options
+                }
+
+            )
+        },
+
+        moment(date){
+            return new moment(date).locale('fr')
+        } ,
+        eleveReleveLink(eleve){
+            return url+"print/eleve_releve/"+eleve.id+"/"+this.selectedSession.id
+        },
+        moyCalc(evals){
+            let total = 0
+            let moyenne = 0
+            let offEval = 0
+            evals.forEach(e=>{
+                if(!e.notes[0].note){
+                    offEval+=1
+                }else {
+                    total = parseFloat(total) + parseFloat(e.notes[0].note)
+                }
+            })
+            moyenne = total/(evals.length-offEval)
+            // console.log("total",total)
+            // console.log("evals",evals.length)
+            return moyenne.toFixed(2);
+
+            /*
+
+             //                    console.log(evals)
+             if(evals.length == 1){
+             return evals[0].pivot.note
+             }else if(evals.length == 2){
+             /!*evals.forEach((e,i)=>{
+             console.log(i+"pivot",e.pivot)
+             console.log(i+"note",e.pivot.note)
+             })*!/
+             let t = evals.reduce(function(a,b){
+             return parseFloat(a.pivot.note).toFixed(2)+parseFloat(b.pivot.note).toFixed(2)
+             })
+             let moy = t/evals.length
+             return moy
+             }else if (evals.length > 2){
+             let moy = 0;
+             let sum = 0;
+             evals.forEach(e=>{
+             sum+=parseFloat(e.pivot.note)
+             })
+
+             return parseFloat(sum/evals.length).toFixed(2)
+             }*/
+
+        },
+        loadEvaluations(){
+            $('#loader').modal('show')
+//                    alert(this.selectedSousMatiereId)
+            this.evals = []
+            if(this.selectedModuleId){
+                instance.get('load_evaluations_of_mod_for_eleve/'+this.selectedEleveId+"/"+this.selectedSessionId+"/"+this.selectedModuleId)
+                    .then(res=>{
+                        $('#loader').modal('hide')
+                        console.log(res.data.evals)
+                        this.evals = res.data.evals
+
+                    }).catch(err=>{
+                    $('#loader').modal('hide')
+                    console.log(err.response.data)
+                })
+            }else if(this.selectedSousMatiereId && this.selectedSousMatiereId!=0){
+                instance.get('load_evaluations_of_sm_for_eleve/'+this.selectedEleveId+"/"+this.selectedSessionId+"/"+this.selectedSousMatiereId)
+                    .then(res=>{
+                        $('#loader').modal('hide')
+                        console.log(res.data.evals)
+                        this.evals = res.data.evals
+                    }).catch(err=>{
+                    $('#loader').modal('hide')
+                    console.log(err.response.data)
+                })
+            }else {
+                instance.get('load_evaluations_for_eleve/'+this.selectedEleveId+"/"+this.selectedSessionId+"/"+this.selectedMatiereId)
+                    .then(res=>{
+                        $('#loader').modal('hide')
+                        console.log(res.data.notes)
+                        this.evals = res.data.evals
+                        // this.notes = res.data.notes
+
+                    }).catch(err=>{
+                    $('#loader').modal('hide')
+                    console.log(err.response.data)
+                })
+            }
+
+
+        },
+
+        getNoteOf(){
+            // let note = eval.pivot.note
+            return 0
+        }
+
+
+
+    }
+};
+
+let vm = new Vue({
+    el:'#app',
+    data:{},
+    mounted(){
+        // alert(0)
+    },
+    methods:{},
+    components:{
+        notes
+    }
+})
