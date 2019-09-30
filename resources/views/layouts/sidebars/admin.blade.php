@@ -27,6 +27,7 @@
                                 <li><a href="{{ route('admin.evaluations.epc') }}">Evalaution par compétence</a></li>
                             </ul>
                         </li>
+                        <li ><a href="{{ route('admin.informations.index') }}" ><i class="icon mdi mdi-graduation-cap"></i><span>Informations</span></a></li>
 
                         <li class="parent"><a href=""><i class="icon mdi mdi-chart-donut"></i><span>Emploi du temps</span></a>
                             <ul class="sub-menu">

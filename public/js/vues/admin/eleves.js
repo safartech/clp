@@ -22,6 +22,7 @@ let Eleves={
                 prenoms:'',
                 sexe:'F',
                 date_nsce:'',
+                created_at:'',
                 adresse:'',
                 nationalite:'',
                 pays_nsce:'',
@@ -87,6 +88,15 @@ let Eleves={
                     navIcons: {rightIcon: "mdi mdi-chevron-right", leftIcon: "mdi mdi-chevron-left"}
                 }
             )
+            $('#date-enr').datetimepicker(
+                {
+                    autoclose: !0,
+                    componentIcon: ".mdi.mdi-calendar",
+                    viewMode:"years",
+//                    useCurrent:true,
+                    navIcons: {rightIcon: "mdi mdi-chevron-right", leftIcon: "mdi mdi-chevron-left"}
+                }
+            )
 
 
             $('#date-nsce1').on('change',(e)=> {
@@ -97,6 +107,11 @@ let Eleves={
                 this.updateEleve.date_nsce = $('#date-nsce2').data('date')
                 // console.log(this.updateEleve.date_nsce)
              })
+
+            $('#date-enr').on('change',(e)=> {
+                this.updateEleve.created_at = $('#date-enr').data('date')
+                // console.log(this.updateEleve.date_nsce)
+            })
 
 
         },

@@ -106,6 +106,14 @@ Route::group(['prefix'=>'ajax'],function(){
     Route::post('add_matiere','Admin\MatiereController@store');
     Route::get('delete_matiere/{id}','Admin\MatiereController@destroy');
 
+    //Informations
+    Route::get('load_informations','Admin\InformationController@loadInformations');
+    Route::post('add_information','Admin\InformationController@store');
+    Route::get('delete_information/{id}','Admin\InformationController@destroy');
+    Route::put('update_information/{id}','Admin\InformationController@updateInformations');
+    Route::put('activate_information/{id}','Admin\InformationController@activateInformation');
+
+
     /**
      * EVALUATIONS
      */
@@ -279,6 +287,7 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('classes','Admin\ClasseController@liste')->name('classes');
         Route::get('matieres','Admin\MatiereController@index')->name('matieres.index');
         Route::get('eleves','Admin\EleveController@index')->name('eleves.index');
+        Route::get('informations','Admin\InformationController@index')->name('informations.index');
         Route::get('responsables','Admin\ResponsableController@index')->name('responsables.index');
         Route::get('Personnels','Admin\PersonnelController@index')->name('personnels.index');
 

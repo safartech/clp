@@ -181,16 +181,25 @@
                                 <input type="text" v-model="updateEleve.pays_nsce" placeholder="Pays de Naissance" class="form-control">
                             </div>
 
-                            <div class="form-group col-md-12">
-                                <label >Classe</label>
-                                <div >
-                                    <select class="form-control"  v-model="updateEleve.classe_id">
-                                        <option :value="classe.id" v-for="classe in classes">@{{ classe.nom }}</option>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label >Classe</label>
+                                    <div >
+                                        <select class="form-control"  v-model="updateEleve.classe_id">
+                                            <option :value="classe.id" v-for="classe in classes">@{{ classe.nom }}</option>
 
-                                    </select>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Date d'enregistrement : <span class="label label-info">@{{ moment(updateEleve.created_at) }}</span> {{--(laissez vide si inchangé)--}}</label>
+
+                                    {{--<input type="text" id="nsce" v-model="updateEleve.date_nsce" placeholder="JJ/MM/AAAA" class="form-control">--}}
+                                    <div id="date-enr" data-start-view="4"  data-min-view="2" data-date-format="yyyy-mm-dd" class="input-group date">
+                                        <input size="16" type="text" value="" class="form-control"><span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                                    </div>
                                 </div>
                             </div>
-
                             <input type="hidden" v-model="u_nomComplet" placeholder="Telephone Mobile" class="form-control">
 
                         </div>
@@ -214,7 +223,7 @@
                         <div class="modal-body">
                             <div class="text-center">
                                 <div class="text-danger"><span class="modal-main-icon mdi mdi-close-circle-o"></span></div>
-                                <h3>Attension!!!!</h3>
+                                <h3>Attention!!!!</h3>
                                 <p>L' élément sera définitivement supprimer de la Base de Donnée.</p>
                                 <div class="xs-mt-50">
                                     <button type="button" data-dismiss="modal" class="btn btn-space btn-default">Annuler</button>
