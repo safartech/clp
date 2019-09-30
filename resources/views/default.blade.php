@@ -42,10 +42,11 @@
         <div class="main-content container-fluid">
 
 
-            <div id="app">
+            <div id="app" >
                 <div class="">
                     @yield('content')
                 </div>
+
             </div>
             
         </div>
@@ -87,8 +88,37 @@
 <script type="text/javascript">
     $(document).ready(function(){
         //initialize the javascript
+       function momento (date) {
+           return moment(date).format('DD MMMM YYYY')
+       }
         App.init();
 //        App.uiNotifications();
+
+        /*ajax request to get information*/
+        var info="Aucune Information à afficher"
+        $('#info_title').html(info)
+        $('#info_content').html('')
+        $('#info_updated_at').html('')
+
+        var request = $.ajax({
+            url: "/ajax/get_valid_information",
+            type: "GET",
+        });
+
+        request.done(function(response) {
+            console.log(response)
+            info=response
+
+            $('#info_title').html(info.title)
+            $('#info_content').html(info.content)
+            var updated_at="Modifié le "+momento(info.updated_at.split(" ")[0]);
+            $('#info_updated_at').html(updated_at)
+
+        });
+
+        request.fail(function(jqXHR, textStatus) {
+            console.log("Request failed: " + textStatus );
+        });
     });
 </script>
 

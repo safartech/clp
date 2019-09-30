@@ -292,9 +292,17 @@
                 </div>
             </div>
         </div>
+            {{--<div class="col-lg-3">--}}
+                {{--<div class="">--}}
+                    {{--<img class="img-responsive" src="{{asset('images/img-pub.jpg')}}"/>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+
             <div class="col-lg-3">
-                <div class="">
-                    <img class="img-responsive" src="{{asset('images/img-pub.jpg')}}"/>
+                <div style="text-align: center ;border: solid 1px #BDBDBD; padding: 1em 1em;background-color: whitesmoke">
+                   <span style="color: red;text-align: left !important;">INFO: </span> <span style="font-weight: bold" id="info_title"></span>
+                    <p id="info_content"></p>
+                    <p style="text-align: right !important;font-size: 09px;font-style: italic" id="info_updated_at"></p>
                 </div>
             </div>
 
@@ -305,13 +313,6 @@
     {{--<script src="{{ asset('assets/lib/jquery.maskedinput/jquery.maskedinput.min.js') }}" type="module"></script>--}}
     <script src="{{ asset('assets/lib/datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
 
-    <script type="text/javascript">
-        $(document).ready(function(){
-            //initialize the javascripts
-          //  App.masks();
-//            $("#nsce").mask("9999-99-99");
-        });
-    </script>
 
 @endsection
 

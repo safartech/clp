@@ -78,6 +78,12 @@ Route::group(['prefix'=>'ajax'],function(){
     Route::get('load_prof_home','HomeController@loadProfHome');
     Route::get('load_admin_home','HomeController@loadAdminHome');
     Route::get('load_parent_home','HomeController@loadParentHome');
+
+    /*
+     * GET VALID INFORMATIONS FROM InitController
+     */
+    Route::get('get_valid_information','InitController@getValidInformation');
+
     /*
      * AJAX ESPACE ADMIN
      *

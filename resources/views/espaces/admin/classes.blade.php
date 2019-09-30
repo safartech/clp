@@ -64,15 +64,20 @@
                         </table>
                     </div>-->
                 <div class="list-group" id="list-tab" role="tablist">
-                                      <a class="list-group-item list-group-item-action disabled" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Nom <span class="badge badge-primary badge-pill">Effectifs</span></a>
-                                      <a v-for="classe in classes" @click="classeClicked(classe)" :class="classeSelectedBgColor(classe)" class="list-group-item list-group-item-action">
-                                      @{{ classe.nom }}
-                                      <span class="badge badge-primary badge-pill">@{{ classe.eleves_count }}</span>
-                                      </a>
-                                </div>
+                      <a class="list-group-item list-group-item-action disabled" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Nom <span class="badge badge-primary badge-pill">Effectifs</span></a>
+                      <a v-for="classe in classes" @click="classeClicked(classe)" :class="classeSelectedBgColor(classe)" class="list-group-item list-group-item-action">
+                      @{{ classe.nom }}
+                      <span class="badge badge-primary badge-pill">@{{ classe.eleves_count }}</span>
+                      </a>
+                </div>
                 </div>
                 <div class="m-t-lg">
-                    <img class="img-responsive" src="{{asset('images/infos.jpg')}}"/>
+                    {{--<img class="img-responsive" src="{{asset('images/infos.jpg')}}"/>--}}
+                    <div style="text-align: center ;border: solid 1px #BDBDBD; padding: 1em 1em;background-color: whitesmoke">
+                        <span style="color: red;text-align: left !important;">INFO: </span> <span style="font-weight: bold" id="info_title"></span>
+                        <p id="info_content"></p>
+                        <p style="text-align: right !important;font-size: 09px;font-style: italic" id="info_updated_at"></p>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-9">
