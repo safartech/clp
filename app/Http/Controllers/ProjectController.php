@@ -4,13 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Absence;
 use App\Appreciation;
+use App\Avi;
 use App\CahierTexte;
 use App\Classe;
 use App\ClasseIntrevention;
+use App\Comment;
+use App\Conseil;
 use App\Cours;
 use App\Dispense;
 use App\Eleve;
 use App\Enseigne;
+use App\Epc;
+use App\Evaluation;
+use App\EvAquisition;
+use App\EvNiveau;
 use App\Examen;
 use App\Intervention;
 use App\LienParente;
@@ -18,9 +25,13 @@ use App\Login;
 use App\Matiere;
 use App\MatiereGroupe;
 use App\MatiereType;
+use App\Notation;
 use App\Note;
+use App\Observation;
 use App\Personnel;
+use App\Post;
 use App\Responsable;
+use App\Retard;
 use App\Salle;
 use App\Seance;
 use App\Session;
@@ -62,13 +73,24 @@ class ProjectController extends Controller
 
     public function newAcademic(){
 
-        Examen::query()->truncate();
-        Note::query()->truncate();
-
-        Dispense::query()->truncate();
-        Absence::query()->truncate();
-        Seance::query()->truncate();
-        Appreciation::query()->truncate();
+//        Examen::truncate();
+        Notation::truncate();
+        Evaluation::truncate();
+        Absence::truncate();
+        Retard::truncate();
+        Seance::truncate();
+        Appreciation::truncate();
+        Avi::truncate();
+        CahierTexte::truncate();
+        Cours::truncate();
+        Conseil::truncate();
+        Epc::truncate();
+        EvNiveau::truncate();
+        EvAquisition::truncate();
+        Login::truncate();
+        Observation::truncate();
+        Post::truncate();
+        Comment::truncate();
 
         return "L'Annee scolaire a été Reinitialisé avec success";
     }
