@@ -59,4 +59,17 @@ class ProjectController extends Controller
 
         return "Projet Reinitialisé avec success";
     }
+
+    public function newAcademic(){
+
+        Examen::query()->truncate();
+        Note::query()->truncate();
+
+        Dispense::query()->truncate();
+        Absence::query()->truncate();
+        Seance::query()->truncate();
+        Appreciation::query()->truncate();
+
+        return "L'Annee scolaire a été Reinitialisé avec success";
+    }
 }
